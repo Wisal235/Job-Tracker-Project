@@ -14,9 +14,11 @@ import ca.wali235.jobtracker.viewmodel.AuthViewModel
 import ca.wali235.jobtracker.viewmodel.AuthViewModelFactory
 import ca.wali235.jobtracker.viewmodel.JobViewModel
 import ca.wali235.jobtracker.viewmodel.JobViewModelFactory
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         val database = Room.databaseBuilder(
