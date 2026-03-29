@@ -12,28 +12,27 @@ class AuthViewModel(
 ) : ViewModel() {
 
     val message = mutableStateOf("")
+    val isSuccess = mutableStateOf(false)
+    val currentUserId = mutableStateOf(0) // save logged in user id
 
     fun signUp(email: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             if (email.isBlank() || password.isBlank()) {
                 message.value = "Please fill in all fields"
+                isSuccess.value = false
                 return@launch
             }
 
             val existingUser = repository.getUserByEmail(email)
             if (existingUser != null) {
                 message.value = "This email is already registered"
+                isSuccess.value = false
                 return@launch
             }
 
-            repository.insertUser(
-                UserEntity(
-                    email = email,
-                    password = password
-                )
-            )
-
+            repository.insertUser(UserEntity(email = email, password = password))
             message.value = "Account created successfully"
+            isSuccess.value = true
             onSuccess()
         }
     }
@@ -42,23 +41,33 @@ class AuthViewModel(
         viewModelScope.launch {
             if (email.isBlank() || password.isBlank()) {
                 message.value = "Please enter email and password"
+                isSuccess.value = false
                 return@launch
             }
 
             val userByEmail = repository.getUserByEmail(email)
             if (userByEmail == null) {
                 message.value = "This email is not registered. Please sign up first"
+                isSuccess.value = false
                 return@launch
             }
 
             val loggedInUser = repository.loginUser(email, password)
             if (loggedInUser == null) {
                 message.value = "Email or password is incorrect"
+                isSuccess.value = false
                 return@launch
             }
 
+            currentUserId.value = loggedInUser.id // save user id on login
             message.value = ""
+            isSuccess.value = false
             onSuccess()
         }
+    }
+
+    fun clearMessage() {
+        message.value = ""
+        isSuccess.value = false
     }
 }

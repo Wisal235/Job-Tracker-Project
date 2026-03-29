@@ -7,7 +7,7 @@ import ca.wali235.jobtracker.data.model.UserEntity
 
 @Database(
     entities = [JobEntity::class, UserEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 abstract class JobDatabase : RoomDatabase() {

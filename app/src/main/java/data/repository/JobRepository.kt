@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.Flow
 class JobRepository(
     private val jobDao: JobDao
 ) {
-
-    fun getAllJobs(): Flow<List<JobEntity>> {
-        return jobDao.getAllJobs()
+    fun getJobsByUser(userId: Int): Flow<List<JobEntity>> {
+        return jobDao.getJobsByUser(userId)
     }
 
     suspend fun insertJob(job: JobEntity) {

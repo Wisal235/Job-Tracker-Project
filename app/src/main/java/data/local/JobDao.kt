@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface JobDao {
 
-    @Query("SELECT * FROM jobs")
-    fun getAllJobs(): Flow<List<JobEntity>>
+    @Query("SELECT * FROM jobs WHERE userId = :userId")
+    fun getJobsByUser(userId: Int): Flow<List<JobEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertJob(job: JobEntity)

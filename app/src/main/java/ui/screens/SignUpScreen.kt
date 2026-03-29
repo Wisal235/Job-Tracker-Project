@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ca.wali235.jobtracker.ui.theme.LightBackground
 import ca.wali235.jobtracker.ui.theme.PrimaryGreen
@@ -96,7 +97,10 @@ fun SignUpScreen(
             if (authViewModel.message.value.isNotEmpty()) {
                 Text(
                     text = authViewModel.message.value,
-                    color = MaterialTheme.colorScheme.error
+                    color = if (authViewModel.isSuccess.value)
+                        Color(0xFF1F6B52)
+                    else
+                        MaterialTheme.colorScheme.error
                 )
             }
 

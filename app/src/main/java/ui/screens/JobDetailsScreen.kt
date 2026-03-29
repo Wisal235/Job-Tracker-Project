@@ -1,24 +1,11 @@
 package ca.wali235.jobtracker.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,7 +18,8 @@ import ca.wali235.jobtracker.viewmodel.JobViewModel
 fun JobDetailsScreen(
     viewModel: JobViewModel,
     jobId: Int,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onEditClick: (Int) -> Unit
 ) {
     val job = viewModel.getJobById(jobId)
 
@@ -88,14 +76,22 @@ fun JobDetailsScreen(
             Text("Location: ${job.location}")
             Text("Job Type: ${job.jobType}")
             Text("Status: ${job.status}")
+            if (job.followUpDate.isNotBlank()) {
+                Text("Follow Up: ${job.followUpDate}")
+            }
 
             Button(
-                onClick = {
-                    viewModel.updateJob(job.copy(status = "Done"))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                onClick = { onEditClick(job.id) },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+            ) {
+                Text("Edit Job")
+            }
+
+            Button(
+                onClick = { viewModel.updateJob(job.copy(status = "Done")) },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
             ) {
@@ -107,9 +103,7 @@ fun JobDetailsScreen(
                     viewModel.deleteJob(job)
                     onBackClick()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text("Delete Job")

@@ -1,15 +1,11 @@
 package ca.wali235.jobtracker.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ca.wali235.jobtracker.ui.screens.AddEditJobScreen
-import ca.wali235.jobtracker.ui.screens.FollowUpScreen
-import ca.wali235.jobtracker.ui.screens.JobDetailsScreen
-import ca.wali235.jobtracker.ui.screens.JobListScreen
-import ca.wali235.jobtracker.ui.screens.LoginScreen
-import ca.wali235.jobtracker.ui.screens.SignUpScreen
+import ca.wali235.jobtracker.ui.screens.*
 import ca.wali235.jobtracker.viewmodel.AuthViewModel
 import ca.wali235.jobtracker.viewmodel.JobViewModel
 
@@ -22,8 +18,17 @@ fun JobTrackerNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Login.route
+        startDestination = Routes.Landing.route
     ) {
+        composable(Routes.Landing.route) {
+            LandingScreen(
+                onGetStarted = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.Landing.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(Routes.Login.route) {
             LoginScreen(
                 authViewModel = authViewModel,
@@ -41,9 +46,7 @@ fun JobTrackerNavGraph(
         composable(Routes.SignUp.route) {
             SignUpScreen(
                 authViewModel = authViewModel,
-                onBackClick = {
-                    navController.popBackStack()
-                },
+                onBackClick = { navController.popBackStack() },
                 onSignUpSuccess = {
                     navController.navigate(Routes.Login.route) {
                         popUpTo(Routes.SignUp.route) { inclusive = true }
@@ -53,6 +56,10 @@ fun JobTrackerNavGraph(
         }
 
         composable(Routes.JobList.route) {
+            // set current user when entering job list
+            LaunchedEffect(Unit) {
+                jobViewModel.setUser(authViewModel.currentUserId.value)
+            }
             JobListScreen(
                 viewModel = jobViewModel,
                 onAddJobClick = {
@@ -75,20 +82,27 @@ fun JobTrackerNavGraph(
         composable(Routes.AddEditJob.route) {
             AddEditJobScreen(
                 viewModel = jobViewModel,
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.EditJob.route) { backStackEntry ->
+            val jobId = backStackEntry.arguments?.getString("jobId")?.toIntOrNull() ?: -1
+            AddEditJobScreen(
+                viewModel = jobViewModel,
+                jobId = jobId,
+                onBackClick = { navController.popBackStack() }
             )
         }
 
         composable(Routes.JobDetails.route) { backStackEntry ->
             val jobId = backStackEntry.arguments?.getString("jobId")?.toIntOrNull() ?: 0
-
             JobDetailsScreen(
                 viewModel = jobViewModel,
                 jobId = jobId,
-                onBackClick = {
-                    navController.popBackStack()
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { id ->
+                    navController.navigate(Routes.EditJob.createRoute(id))
                 }
             )
         }
@@ -96,9 +110,7 @@ fun JobTrackerNavGraph(
         composable(Routes.FollowUp.route) {
             FollowUpScreen(
                 viewModel = jobViewModel,
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                onBackClick = { navController.popBackStack() }
             )
         }
     }
