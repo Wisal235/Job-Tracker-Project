@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- padding values -->
+    <!-- we use these for spacing between items -->
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <dimen name="padding_xlarge">32dp</dimen>
+
+    <!-- icon size -->
+    <!-- small icon for inside buttons, big icon for top of screen -->
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+
+    <!-- text field and button height -->
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="text_field_height">56dp</dimen>
+
+    <!-- max width for forms on tablet -->
+    <dimen name="form_max_width">480dp</dimen>
+
+    <!-- card elevation -->
+    <dimen name="card_elevation">2dp</dimen>
+
+</resources>

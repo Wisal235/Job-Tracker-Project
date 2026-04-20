@@ -77,7 +77,9 @@ fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "W",
+                            // use first letter of email if user is logged in, else "?"
+                            text = authViewModel.currentUserEmail.value
+                                .firstOrNull()?.uppercase() ?: "?",
                             color = PrimaryGreen,
                             fontSize = 40.sp,
                             fontWeight = FontWeight.Bold
@@ -177,7 +179,7 @@ fun ProfileScreen(
                             color = Color.Gray
                         )
                         Text(
-                            text = "User #${authViewModel.currentUserId.value}",
+                            text = authViewModel.currentUserEmail.value.ifEmpty { "Guest" },
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextDark,
                             fontWeight = FontWeight.Medium

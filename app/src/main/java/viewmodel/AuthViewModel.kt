@@ -14,6 +14,7 @@ class AuthViewModel(
     val message = mutableStateOf("")
     val isSuccess = mutableStateOf(false)
     val currentUserId = mutableStateOf(0) // save logged in user id
+    val currentUserEmail = mutableStateOf("") // save logged in user email
 
     fun signUp(email: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -60,10 +61,17 @@ class AuthViewModel(
             }
 
             currentUserId.value = loggedInUser.id // save user id on login
+            currentUserEmail.value = loggedInUser.email // save email on login
             message.value = ""
             isSuccess.value = false
             onSuccess()
         }
+    }
+
+    fun logout() {
+        // clear user info when logging out
+        currentUserId.value = 0
+        currentUserEmail.value = ""
     }
 
     fun clearMessage() {

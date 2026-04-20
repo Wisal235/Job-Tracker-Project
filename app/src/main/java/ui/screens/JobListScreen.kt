@@ -1,8 +1,29 @@
 package ca.wali235.jobtracker.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,7 +57,6 @@ fun JobListScreen(
     viewModel: JobViewModel,
     onAddJobClick: () -> Unit,
     onJobClick: (Int) -> Unit
-
 ) {
     val jobs by viewModel.jobs.collectAsState()
 
@@ -81,7 +101,6 @@ fun JobListScreen(
                         )
                     }
                 },
-
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = LightBackground
                 )
@@ -105,113 +124,139 @@ fun JobListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (jobs.isEmpty()) {
-                // show big empty state when no jobs
+            // animated empty state - shows with fade + slide when no jobs
+            AnimatedVisibility(
+                visible = jobs.isEmpty(),
+                enter = fadeIn(animationSpec = tween(500)) +
+                        slideInVertically(animationSpec = tween(500)),
+                exit = fadeOut() + slideOutVertically()
+            ) {
                 EmptyState()
-            } else {
-                // stats row with 3 small cards
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        count = totalJobs,
-                        label = "Total",
-                        color = PrimaryGreen
-                    )
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        count = activeJobs,
-                        label = "Active",
-                        color = ActiveColor
-                    )
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        count = followUpCount,
-                        label = "Follow-ups",
-                        color = LeadColor
-                    )
-                }
+            }
 
-                // search bar to find jobs by name or location
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    placeholder = { Text("Search clients or locations") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = null)
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryGreen,
-                        focusedLeadingIconColor = PrimaryGreen
-                    )
-                )
+            // main content shows when there is at least one job
+            AnimatedVisibility(
+                visible = jobs.isNotEmpty(),
+                enter = fadeIn(animationSpec = tween(400)),
+                exit = fadeOut()
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
 
-                // filter chips for job status
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val filters = listOf("All", "Lead", "Quote", "Active", "Done")
-                    items(filters) { filter ->
-                        FilterChip(
-                            selected = selectedFilter == filter,
-                            onClick = { selectedFilter = filter },
-                            label = { Text(filter) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = PrimaryGreen,
-                                selectedLabelColor = Color.White
-                            )
+                    // stats row with 3 small cards
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            count = totalJobs,
+                            label = "Total",
+                            color = PrimaryGreen
+                        )
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            count = activeJobs,
+                            label = "Active",
+                            color = ActiveColor
+                        )
+                        StatCard(
+                            modifier = Modifier.weight(1f),
+                            count = followUpCount,
+                            label = "Follow-ups",
+                            color = LeadColor
                         )
                     }
-                }
 
-                // list of jobs or no match state
-                if (filteredJobs.isEmpty()) {
-                    // show message when search or filter has no results
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                    // search bar to find jobs by name or location
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        placeholder = { Text("Search clients or locations") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Search, contentDescription = null)
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryGreen,
+                            focusedLeadingIconColor = PrimaryGreen
+                        )
+                    )
+
+                    // filter chips for job status
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "🔍", fontSize = 48.sp)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "No jobs match",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = PrimaryGreen
-                            )
-                            Text(
-                                text = "Try a different search or filter",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
+                        val filters = listOf("All", "Lead", "Quote", "Active", "Done")
+                        items(filters) { filter ->
+                            FilterChip(
+                                selected = selectedFilter == filter,
+                                onClick = { selectedFilter = filter },
+                                label = { Text(filter) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = PrimaryGreen,
+                                    selectedLabelColor = Color.White
+                                )
                             )
                         }
                     }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = 80.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+
+                    // animated no-match state when search/filter has no results
+                    AnimatedVisibility(
+                        visible = filteredJobs.isEmpty(),
+                        enter = fadeIn(animationSpec = tween(300)) +
+                                slideInVertically(animationSpec = tween(300)),
+                        exit = fadeOut()
                     ) {
-                        items(filteredJobs) { job ->
-                            JobCard(job = job, onClick = { onJobClick(job.id) })
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "🔍", fontSize = 48.sp)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "No jobs match",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = PrimaryGreen
+                                )
+                                Text(
+                                    text = "Try a different search or filter",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+
+                    // animated list - shows when there are matching jobs
+                    AnimatedVisibility(
+                        visible = filteredJobs.isNotEmpty(),
+                        enter = fadeIn(animationSpec = tween(300)),
+                        exit = fadeOut()
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 8.dp,
+                                bottom = 80.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(filteredJobs) { job ->
+                                JobCard(job = job, onClick = { onJobClick(job.id) })
+                            }
                         }
                     }
                 }
@@ -262,6 +307,7 @@ private fun JobCard(job: JobEntity, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .animateContentSize()
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = CardBackground),
@@ -311,7 +357,12 @@ private fun JobCard(job: JobEntity, onClick: () -> Unit) {
 // small colored badge that shows the job status
 @Composable
 private fun StatusBadge(status: String) {
-    val color = getStatusColor(status)
+    // color changes with smooth animation when status updates
+    val color by animateColorAsState(
+        targetValue = getStatusColor(status),
+        animationSpec = tween(400),
+        label = "statusColor"
+    )
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = color.copy(alpha = 0.15f)
@@ -370,12 +421,15 @@ private fun EmptyState() {
     }
 }
 
-// helper to get the color that matches a status
+// helper function that returns the right color for each job status
+// we use this in JobCard and StatusBadge
 @Composable
-fun getStatusColor(status: String) = when (status) {
-    "Lead" -> LeadColor
-    "Quote" -> QuoteColor
-    "Active" -> ActiveColor
-    "Done" -> DoneColor
-    else -> LeadColor
+fun getStatusColor(status: String): Color {
+    return when (status) {
+        "Lead" -> LeadColor
+        "Quote" -> QuoteColor
+        "Active" -> ActiveColor
+        "Done" -> DoneColor
+        else -> Color.Gray
+    }
 }
