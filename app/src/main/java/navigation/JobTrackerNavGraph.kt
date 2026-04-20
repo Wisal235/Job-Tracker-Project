@@ -29,11 +29,13 @@ fun JobTrackerNavGraph(
                 }
             )
         }
+
         composable(Routes.Login.route) {
             LoginScreen(
                 authViewModel = authViewModel,
                 onLoginClick = {
-                    navController.navigate(Routes.JobList.route) {
+                    // go to Main wrapper now (with bottom nav) instead of JobList directly
+                    navController.navigate(Routes.Main.route) {
                         popUpTo(Routes.Login.route) { inclusive = true }
                     }
                 },
@@ -55,25 +57,24 @@ fun JobTrackerNavGraph(
             )
         }
 
-        composable(Routes.JobList.route) {
-            // set current user when entering job list
+        // main screen with bottom nav - holds jobs / follow ups / profile tabs
+        composable(Routes.Main.route) {
+            // set current user once we land in the main area
             LaunchedEffect(Unit) {
                 jobViewModel.setUser(authViewModel.currentUserId.value)
             }
-            JobListScreen(
-                viewModel = jobViewModel,
+            MainScreen(
+                jobViewModel = jobViewModel,
+                authViewModel = authViewModel,
                 onAddJobClick = {
                     navController.navigate(Routes.AddEditJob.route)
                 },
                 onJobClick = { jobId ->
                     navController.navigate(Routes.JobDetails.createRoute(jobId))
                 },
-                onFollowUpClick = {
-                    navController.navigate(Routes.FollowUp.route)
-                },
                 onLogoutClick = {
                     navController.navigate(Routes.Login.route) {
-                        popUpTo(Routes.JobList.route) { inclusive = true }
+                        popUpTo(Routes.Main.route) { inclusive = true }
                     }
                 }
             )
@@ -104,13 +105,6 @@ fun JobTrackerNavGraph(
                 onEditClick = { id ->
                     navController.navigate(Routes.EditJob.createRoute(id))
                 }
-            )
-        }
-
-        composable(Routes.FollowUp.route) {
-            FollowUpScreen(
-                viewModel = jobViewModel,
-                onBackClick = { navController.popBackStack() }
             )
         }
     }
