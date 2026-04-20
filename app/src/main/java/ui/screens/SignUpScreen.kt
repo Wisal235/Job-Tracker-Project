@@ -61,226 +61,233 @@ fun SignUpScreen(
         },
         containerColor = LightBackground
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(LightBackground)
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.Center
         ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // green circle logo with person add icon
-            Box(
+            Column(
                 modifier = Modifier
-                    .size(90.dp)
-                    .background(PrimaryGreen, CircleShape),
-                contentAlignment = Alignment.Center
+                    .widthIn(max = 480.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.PersonAdd,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(44.dp)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Join Us!",
-                style = MaterialTheme.typography.headlineLarge,
-                color = PrimaryGreen,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = "Create your account to get started",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // email field with email icon
-            OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
-                label = { Text("Email") },
-                leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = null, tint = PrimaryGreen)
-                },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryGreen,
-                    focusedLabelColor = PrimaryGreen
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // password field with lock icon and show/hide eye
-            OutlinedTextField(
-                value = password.value,
-                onValueChange = {
-                    password.value = it
-                    mismatchError = ""
-                },
-                label = { Text("Password") },
-                leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = PrimaryGreen)
-                },
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible)
-                                Icons.Default.VisibilityOff
-                            else
-                                Icons.Default.Visibility,
-                            contentDescription = null,
-                            tint = Color.Gray
-                        )
-                    }
-                },
-                visualTransformation = if (passwordVisible)
-                    VisualTransformation.None
-                else
-                    PasswordVisualTransformation(),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryGreen,
-                    focusedLabelColor = PrimaryGreen
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // confirm password field so user types it twice
-            OutlinedTextField(
-                value = confirmPassword.value,
-                onValueChange = {
-                    confirmPassword.value = it
-                    mismatchError = ""
-                },
-                label = { Text("Confirm Password") },
-                leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = PrimaryGreen)
-                },
-                trailingIcon = {
-                    IconButton(onClick = { confirmVisible = !confirmVisible }) {
-                        Icon(
-                            imageVector = if (confirmVisible)
-                                Icons.Default.VisibilityOff
-                            else
-                                Icons.Default.Visibility,
-                            contentDescription = null,
-                            tint = Color.Gray
-                        )
-                    }
-                },
-                visualTransformation = if (confirmVisible)
-                    VisualTransformation.None
-                else
-                    PasswordVisualTransformation(),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryGreen,
-                    focusedLabelColor = PrimaryGreen
-                )
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // show the mismatch error first then viewmodel message
-            val displayMessage = when {
-                mismatchError.isNotEmpty() -> mismatchError
-                authViewModel.message.value.isNotEmpty() -> authViewModel.message.value
-                else -> ""
-            }
-            val displaySuccess = mismatchError.isEmpty() && authViewModel.isSuccess.value
-
-            if (displayMessage.isNotEmpty()) {
-                val bg = if (displaySuccess) PrimaryGreen.copy(alpha = 0.12f)
-                else Color(0xFFD32F2F).copy(alpha = 0.12f)
-                val textColor = if (displaySuccess) PrimaryGreen else Color(0xFFD32F2F)
+                // green circle logo with person add icon
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(bg, RoundedCornerShape(12.dp))
-                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                        .size(90.dp)
+                        .background(PrimaryGreen, CircleShape),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = displayMessage,
-                        color = textColor,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(44.dp)
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            // big green create account button
-            Button(
-                onClick = {
-                    // first check that the two passwords match
-                    if (password.value != confirmPassword.value) {
-                        mismatchError = "Passwords do not match"
-                    } else {
-                        mismatchError = ""
-                        authViewModel.signUp(
-                            email = email.value,
-                            password = password.value,
-                            onSuccess = onSignUpSuccess
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
-            ) {
-                Icon(Icons.Default.PersonAdd, contentDescription = null, tint = Color.White)
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Create Account",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 16.sp
+                    text = "Join Us!",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = PrimaryGreen,
+                    fontWeight = FontWeight.Bold
                 )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // link to go back to login for people who already have account
-            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Already have an account? ",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Create your account to get started",
+                    style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray
                 )
-                TextButton(
-                    onClick = {
-                        authViewModel.clearMessage()
-                        onBackClick()
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // email field with email icon
+                OutlinedTextField(
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    label = { Text("Email") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Email, contentDescription = null, tint = PrimaryGreen)
                     },
-                    contentPadding = PaddingValues(4.dp)
-                ) {
-                    Text(
-                        text = "Login",
-                        color = PrimaryGreen,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryGreen,
+                        focusedLabelColor = PrimaryGreen
                     )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // password field with lock icon and show/hide eye
+                OutlinedTextField(
+                    value = password.value,
+                    onValueChange = {
+                        password.value = it
+                        mismatchError = ""
+                    },
+                    label = { Text("Password") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = null, tint = PrimaryGreen)
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = Color.Gray
+                            )
+                        }
+                    },
+                    visualTransformation = if (passwordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryGreen,
+                        focusedLabelColor = PrimaryGreen
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // confirm password field so user types it twice
+                OutlinedTextField(
+                    value = confirmPassword.value,
+                    onValueChange = {
+                        confirmPassword.value = it
+                        mismatchError = ""
+                    },
+                    label = { Text("Confirm Password") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = null, tint = PrimaryGreen)
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { confirmVisible = !confirmVisible }) {
+                            Icon(
+                                imageVector = if (confirmVisible)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = Color.Gray
+                            )
+                        }
+                    },
+                    visualTransformation = if (confirmVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryGreen,
+                        focusedLabelColor = PrimaryGreen
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // show the mismatch error first then viewmodel message
+                val displayMessage = when {
+                    mismatchError.isNotEmpty() -> mismatchError
+                    authViewModel.message.value.isNotEmpty() -> authViewModel.message.value
+                    else -> ""
+                }
+                val displaySuccess = mismatchError.isEmpty() && authViewModel.isSuccess.value
+
+                if (displayMessage.isNotEmpty()) {
+                    val bg = if (displaySuccess) PrimaryGreen.copy(alpha = 0.12f)
+                    else Color(0xFFD32F2F).copy(alpha = 0.12f)
+                    val textColor = if (displaySuccess) PrimaryGreen else Color(0xFFD32F2F)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(bg, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                    ) {
+                        Text(
+                            text = displayMessage,
+                            color = textColor,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // big green create account button
+                Button(
+                    onClick = {
+                        // first check that the two passwords match
+                        if (password.value != confirmPassword.value) {
+                            mismatchError = "Passwords do not match"
+                        } else {
+                            mismatchError = ""
+                            authViewModel.signUp(
+                                email = email.value,
+                                password = password.value,
+                                onSuccess = onSignUpSuccess
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                ) {
+                    Icon(Icons.Default.PersonAdd, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Create Account",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontSize = 16.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // link to go back to login for people who already have account
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Already have an account? ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                    TextButton(
+                        onClick = {
+                            authViewModel.clearMessage()
+                            onBackClick()
+                        },
+                        contentPadding = PaddingValues(4.dp)
+                    ) {
+                        Text(
+                            text = "Login",
+                            color = PrimaryGreen,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         }
